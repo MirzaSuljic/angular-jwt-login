@@ -120,5 +120,8 @@
       }
     }
   },
-  "defaultProject": "angular-jwt-login"
+  "defaultProject": "angular-jwt-login",
+  "cli": {
+    "analytics": false
+  }
 }
