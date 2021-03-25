@@ -6,10 +6,11 @@ import { AccountComponent } from './account.component';
 import { ForgotPasswordComponent } from './components/forgot-password/forgot-password.component';
 import { LayoutComponent } from './components/layout/layout.component';
 import { LoginComponent } from './components/login/login.component';
+import { RegisterComponent } from './components/register/register.component';
 
 
 @NgModule({
-  declarations: [AccountComponent, ForgotPasswordComponent, LayoutComponent, LoginComponent],
+  declarations: [AccountComponent, ForgotPasswordComponent, LayoutComponent, LoginComponent, RegisterComponent],
   imports: [
     CommonModule,
     AccountRoutingModule
