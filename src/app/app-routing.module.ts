@@ -14,6 +14,7 @@ const routes: Routes = [
     path: '',
     component: LoginComponent
   },
+  { path: 'account', loadChildren: () => import('./account/account.module').then(m => m.AccountModule) },
   // otherwise redirect to home
   {
     path: '**',
