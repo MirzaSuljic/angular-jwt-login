@@ -1,3 +1,5 @@
+import { AlertType } from "../enums/alert-type.enum";
+
 export class Alert {
   id: string;
   type: AlertType;
@@ -11,9 +13,3 @@ export class Alert {
   }
 }
 
-export enum AlertType {
-  Success,
-  Error,
-  Info,
-  Warning
-}
