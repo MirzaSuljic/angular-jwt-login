@@ -1,20 +1,22 @@
 import { Component } from '@angular/core';
-import { User } from './_models/user';
-import { AuthenticationService } from './_services/authentication.service';
+import { Role } from './_models/role';
+import { Account } from './_models/account';
+import { AccountService } from './_services/account.service';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+  styleUrls: ['./app.component.css'],
 })
 export class AppComponent {
-  user: User;
+  Role = Role;
+  account: Account;
 
-  constructor(private authenticationService: AuthenticationService) {
-      this.authenticationService.user.subscribe(x => this.user = x);
+  constructor(private accountService: AccountService) {
+    this.accountService.account.subscribe((x) => (this.account = x));
   }
 
-  logout(){
-    this.authenticationService.logout();
+  logout() {
+    this.accountService.logout();
   }
 }
