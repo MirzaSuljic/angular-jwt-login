@@ -1,25 +1,26 @@
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { first } from 'rxjs/operators';
-import { EmailStatus } from 'src/app/enums/email-status.enum';
-import { AccountService } from 'src/app/_services/account.service';
-import { AlertService } from 'src/app/_services/alert.service';
+
+import { EmailStatus } from '../../../enums/email-status.enum';
+import { AccountService } from '../../../_services/account.service';
+import { AlertService } from '../../../_services/alert.service';
 
 @Component({
   selector: 'app-verify-email',
+  imports: [RouterLink],
   templateUrl: './verify-email.component.html',
-  styleUrls: ['./verify-email.component.css'],
+  styleUrl: './verify-email.component.css',
+  changeDetection: ChangeDetectionStrategy.Eager,
 })
 export class VerifyEmailComponent implements OnInit {
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private accountService = inject(AccountService);
+  private alertService = inject(AlertService);
+
   EmailStatus = EmailStatus;
   emailStatus = EmailStatus.Verifying;
-
-  constructor(
-    private route: ActivatedRoute,
-    private router: Router,
-    private accountService: AccountService,
-    private alertService: AlertService
-  ) {}
 
   ngOnInit(): void {
     const token = this.route.snapshot.queryParams['token'];
@@ -32,10 +33,9 @@ export class VerifyEmailComponent implements OnInit {
       .pipe(first())
       .subscribe({
         next: () => {
-          this.alertService.success(
-            'Verification successful, you can now login',
-            { keepAfterRouteChange: true }
-          );
+          this.alertService.success('Verification successful, you can now login', {
+            keepAfterRouteChange: true,
+          });
           this.router.navigate(['../login'], { relativeTo: this.route });
         },
         error: () => {

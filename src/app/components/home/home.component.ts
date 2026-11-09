@@ -1,13 +1,15 @@
-import { Component, OnInit } from '@angular/core';
-import { AccountService } from 'src/app/_services/account.service';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+
+import { AccountService } from '../../_services/account.service';
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
-  styleUrls: ['./home.component.css'],
+  styleUrl: './home.component.css',
+  changeDetection: ChangeDetectionStrategy.Eager,
 })
 export class HomeComponent {
-  account = this.accountService.accountValue;
+  private accountService = inject(AccountService);
 
-  constructor(private accountService: AccountService) {}
+  account = this.accountService.accountValue;
 }

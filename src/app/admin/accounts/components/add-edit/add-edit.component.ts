@@ -1,30 +1,32 @@
-import { Component, OnInit } from '@angular/core';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { first } from 'rxjs/operators';
-import { MustMatch } from 'src/app/_helpers/must-match.validator';
-import { AccountService } from 'src/app/_services/account.service';
-import { AlertService } from 'src/app/_services/alert.service';
+
+import { MustMatch } from '../../../../_helpers/must-match.validator';
+import { AccountService } from '../../../../_services/account.service';
+import { AlertService } from '../../../../_services/alert.service';
 
 @Component({
   selector: 'app-add-edit',
+  imports: [ReactiveFormsModule, RouterLink],
   templateUrl: './add-edit.component.html',
-  styleUrls: ['./add-edit.component.css'],
+  styleUrl: './add-edit.component.css',
+  changeDetection: ChangeDetectionStrategy.Eager,
 })
 export class AddEditComponent implements OnInit {
+  private formBuilder = inject(FormBuilder);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private accountService = inject(AccountService);
+  private alertService = inject(AlertService);
+
   form: FormGroup;
   id: string;
   isAddMode: boolean;
   loading = false;
   submitted = false;
 
-  constructor(
-    private formBuilder: FormBuilder,
-    private route: ActivatedRoute,
-    private router: Router,
-    private accountService: AccountService,
-    private alertService: AlertService
-  ) {}
   ngOnInit(): void {
     this.id = this.route.snapshot.params['id'];
     this.isAddMode = !this.id;
@@ -38,17 +40,15 @@ export class AddEditComponent implements OnInit {
         role: ['', Validators.required],
         password: [
           '',
-          [
-            Validators.minLength(6),
-            this.isAddMode ? Validators.required : Validators.nullValidator,
-          ],
+          [Validators.minLength(6), this.isAddMode ? Validators.required : Validators.nullValidator],
         ],
         confirmPassword: [''],
       },
       {
-        validator: MustMatch('password', 'confirmPassword'),
+        validators: MustMatch('password', 'confirmPassword'),
       }
     );
+
     if (!this.isAddMode) {
       this.accountService
         .getById(this.id)
@@ -56,6 +56,7 @@ export class AddEditComponent implements OnInit {
         .subscribe((x) => this.form.patchValue(x));
     }
   }
+
   // convenience getter for easy access to form fields
   get f() {
     return this.form.controls;
@@ -97,6 +98,7 @@ export class AddEditComponent implements OnInit {
         },
       });
   }
+
   private updateAccount() {
     this.accountService
       .update(this.id, this.form.value)

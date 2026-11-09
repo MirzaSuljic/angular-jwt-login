@@ -1,9 +1,10 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { map, finalize } from 'rxjs/operators';
-import { environment } from 'src/environments/environment';
+import { finalize, map } from 'rxjs/operators';
+
+import { environment } from '../../environments/environment';
 import { Account } from '../_models/account';
 
 const baseUrl = `${environment.apiUrl}/accounts`;
@@ -12,13 +13,13 @@ const baseUrl = `${environment.apiUrl}/accounts`;
   providedIn: 'root',
 })
 export class AccountService {
-  private accountSubject: BehaviorSubject<Account>;
-  public account: Observable<Account>;
+  private router = inject(Router);
+  private http = inject(HttpClient);
 
-  constructor(private router: Router, private http: HttpClient) {
-    this.accountSubject = new BehaviorSubject<Account>(null);
-    this.account = this.accountSubject.asObservable();
-  }
+  private accountSubject = new BehaviorSubject<Account>(null);
+  public account: Observable<Account> = this.accountSubject.asObservable();
+
+  private refreshTokenTimeout?: ReturnType<typeof setTimeout>;
 
   public get accountValue(): Account {
     return this.accountSubject.value;
@@ -26,11 +27,7 @@ export class AccountService {
 
   login(email: string, password: string) {
     return this.http
-      .post<any>(
-        `${baseUrl}/authenticate`,
-        { email, password },
-        { withCredentials: true }
-      )
+      .post<Account>(`${baseUrl}/authenticate`, { email, password }, { withCredentials: true })
       .pipe(
         map((account) => {
           this.accountSubject.next(account);
@@ -41,24 +38,20 @@ export class AccountService {
   }
 
   logout() {
-    this.http
-      .post<any>(`${baseUrl}/revoke-token`, {}, { withCredentials: true })
-      .subscribe();
+    this.http.post(`${baseUrl}/revoke-token`, {}, { withCredentials: true }).subscribe();
     this.stopRefreshTokenTimer();
     this.accountSubject.next(null);
     this.router.navigate(['/account/login']);
   }
 
   refreshToken() {
-    return this.http
-      .post<any>(`${baseUrl}/refresh-token`, {}, { withCredentials: true })
-      .pipe(
-        map((account) => {
-          this.accountSubject.next(account);
-          this.startRefreshTokenTimer();
-          return account;
-        })
-      );
+    return this.http.post<Account>(`${baseUrl}/refresh-token`, {}, { withCredentials: true }).pipe(
+      map((account) => {
+        this.accountSubject.next(account);
+        this.startRefreshTokenTimer();
+        return account;
+      })
+    );
   }
 
   register(account: Account) {
@@ -93,13 +86,13 @@ export class AccountService {
     return this.http.get<Account>(`${baseUrl}/${id}`);
   }
 
-  create(params) {
+  create(params: Partial<Account>) {
     return this.http.post(baseUrl, params);
   }
 
-  update(id, params) {
-    return this.http.put(`${baseUrl}/${id}`, params).pipe(
-      map((account: any) => {
+  update(id: string, params: Partial<Account>) {
+    return this.http.put<Account>(`${baseUrl}/${id}`, params).pipe(
+      map((account) => {
         // update the current account if it was updated
         if (account.id === this.accountValue.id) {
           // publish updated account to subscribers
@@ -122,8 +115,6 @@ export class AccountService {
 
   // helper methods
 
-  private refreshTokenTimeout;
-
   private startRefreshTokenTimer() {
     // parse json object from base64 encoded jwt token
     const jwtToken = JSON.parse(atob(this.accountValue.jwtToken.split('.')[1]));
@@ -131,10 +122,7 @@ export class AccountService {
     // set a timeout to refresh the token a minute before it expires
     const expires = new Date(jwtToken.exp * 1000);
     const timeout = expires.getTime() - Date.now() - 60 * 1000;
-    this.refreshTokenTimeout = setTimeout(
-      () => this.refreshToken().subscribe(),
-      timeout
-    );
+    this.refreshTokenTimeout = setTimeout(() => this.refreshToken().subscribe(), timeout);
   }
 
   private stopRefreshTokenTimer() {

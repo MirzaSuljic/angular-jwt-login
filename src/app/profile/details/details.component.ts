@@ -1,13 +1,17 @@
-import { Component } from '@angular/core';
-import { AccountService } from 'src/app/_services';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { RouterLink } from '@angular/router';
+
+import { AccountService } from '../../_services/account.service';
 
 @Component({
   selector: 'app-details',
+  imports: [RouterLink],
   templateUrl: './details.component.html',
-  styleUrls: ['./details.component.css']
+  styleUrl: './details.component.css',
+  changeDetection: ChangeDetectionStrategy.Eager,
 })
 export class DetailsComponent {
-  account = this.accountService.accountValue;
+  private accountService = inject(AccountService);
 
-  constructor(private accountService: AccountService) { }
+  account = this.accountService.accountValue;
 }

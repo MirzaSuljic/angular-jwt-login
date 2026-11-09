@@ -1,27 +1,36 @@
 # AngularJwtLogin
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 11.0.5.
+Angular 22 app: email sign-up with verification, JWT authentication with refresh tokens,
+forgot/reset password, role-based access (User / Admin) and an admin account manager.
+A fake backend (`src/app/_helpers/fake-backend.ts`) stores accounts in `localStorage`,
+so the app runs without a real API.
+
+Requires Node.js `^22.22.3`, `^24.15.0` or `^26`.
 
 ## Development server
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
-
-## Code scaffolding
-
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+```bash
+npm install
+npm start        # ng serve -> http://localhost:4200/
+```
 
 ## Build
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
+```bash
+npm run build    # production build in dist/angular-jwt-login
+```
 
 ## Running unit tests
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+```bash
+npm test         # ng test (Vitest + jsdom)
+```
 
-## Running end-to-end tests
+## Project structure (Angular 22 style)
 
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+- Standalone components, `bootstrapApplication` in `src/main.ts`, providers in `src/app/app.config.ts`
+- Lazy-loaded route files: `account/account.routes.ts`, `profile/profile.routes.ts`,
+  `admin/admin.routes.ts`, `admin/accounts/accounts.routes.ts`
+- Functional guard (`authGuard`) and interceptors (`jwtInterceptor`, `errorInterceptor`, `fakeBackendInterceptor`)
+- Built-in control flow (`@if`, `@for`) in templates
+- Zone.js change detection with `ChangeDetectionStrategy.Eager` on the existing components

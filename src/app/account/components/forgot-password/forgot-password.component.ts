@@ -1,30 +1,31 @@
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { finalize, first } from 'rxjs/operators';
-import { AccountService } from 'src/app/_services/account.service';
-import { AlertService } from 'src/app/_services/alert.service';
+
+import { AccountService } from '../../../_services/account.service';
+import { AlertService } from '../../../_services/alert.service';
 
 @Component({
   selector: 'app-forgot-password',
+  imports: [ReactiveFormsModule, RouterLink],
   templateUrl: './forgot-password.component.html',
-  styleUrls: ['./forgot-password.component.css']
+  styleUrl: './forgot-password.component.css',
+  changeDetection: ChangeDetectionStrategy.Eager,
 })
 export class ForgotPasswordComponent implements OnInit {
+  private formBuilder = inject(FormBuilder);
+  private accountService = inject(AccountService);
+  private alertService = inject(AlertService);
+
   form: FormGroup;
   loading = false;
   submitted = false;
 
-  constructor(
-    private formBuilder: FormBuilder,
-    private accountService: AccountService,
-    private alertService: AlertService
-  ) { }
-
   ngOnInit(): void {
     this.form = this.formBuilder.group({
-      email: ['', [Validators.required, Validators.email]]
+      email: ['', [Validators.required, Validators.email]],
     });
-
   }
 
   // convenience getter for easy access to form fields
@@ -44,14 +45,16 @@ export class ForgotPasswordComponent implements OnInit {
     }
 
     this.loading = true;
-    this.alertService.clear();
-    this.accountService.forgotPassword(this.f.email.value)
-      .pipe(first())
-      .pipe(finalize(() => this.loading = false))
+    this.accountService
+      .forgotPassword(this.f.email.value)
+      .pipe(
+        first(),
+        finalize(() => (this.loading = false))
+      )
       .subscribe({
-        next: () => this.alertService.success('Please check your email for password reset instructions'),
-        error: error => this.alertService.error(error)
+        next: () =>
+          this.alertService.success('Please check your email for password reset instructions'),
+        error: (error) => this.alertService.error(error),
       });
   }
-
 }

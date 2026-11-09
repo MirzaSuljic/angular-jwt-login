@@ -1,12 +1,13 @@
-import { Role } from "./role";
+import { Role } from './role';
 
-
-export class Account {
-    id: string;
-    title: string;
-    firstName: string;
-    lastName: string;
-    email: string;
-    role: Role;
-    jwtToken?: string;
+export interface Account {
+  id: string;
+  title: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  role: Role;
+  jwtToken?: string;
+  password?: string;
+  confirmPassword?: string;
 }

@@ -1,14 +1,20 @@
-import { Component } from '@angular/core';
-import { Router } from '@angular/router';
-import { AccountService } from 'src/app/_services/account.service';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { Router, RouterOutlet } from '@angular/router';
+
+import { AccountService } from '../../../_services/account.service';
 
 @Component({
-  selector: 'app-layout',
+  selector: 'app-account-layout',
+  imports: [RouterOutlet],
   templateUrl: './layout.component.html',
-  styleUrls: ['./layout.component.css'],
+  styleUrl: './layout.component.css',
+  changeDetection: ChangeDetectionStrategy.Eager,
 })
 export class LayoutComponent {
-  constructor(private router: Router, private accountService: AccountService) {
+  private router = inject(Router);
+  private accountService = inject(AccountService);
+
+  constructor() {
     // redirect to home if already logged in
     if (this.accountService.accountValue) {
       this.router.navigate(['/']);

@@ -1,0 +1,27 @@
+import { Routes } from '@angular/router';
+
+import { HomeComponent } from './components/home/home.component';
+import { authGuard } from './_helpers/auth.guard';
+import { Role } from './_models/role';
+
+export const routes: Routes = [
+  { path: '', component: HomeComponent, canActivate: [authGuard] },
+  {
+    path: 'account',
+    loadChildren: () => import('./account/account.routes').then((m) => m.ACCOUNT_ROUTES),
+  },
+  {
+    path: 'profile',
+    loadChildren: () => import('./profile/profile.routes').then((m) => m.PROFILE_ROUTES),
+    canActivate: [authGuard],
+  },
+  {
+    path: 'admin',
+    loadChildren: () => import('./admin/admin.routes').then((m) => m.ADMIN_ROUTES),
+    canActivate: [authGuard],
+    data: { roles: [Role.Admin] },
+  },
+
+  // otherwise redirect to home
+  { path: '**', redirectTo: '' },
+];

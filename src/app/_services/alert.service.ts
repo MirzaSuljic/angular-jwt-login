@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
-import { Subject, Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { filter } from 'rxjs/operators';
+
 import { AlertType } from '../enums/alert-type.enum';
 import { Alert } from '../_models/alert';
 
@@ -17,19 +18,19 @@ export class AlertService {
   }
 
   // convenience methods
-  success(message: string, options?: any) {
+  success(message: string, options?: Partial<Alert>) {
     this.alert(new Alert({ ...options, type: AlertType.Success, message }));
   }
 
-  error(message: string, options?: any) {
+  error(message: string, options?: Partial<Alert>) {
     this.alert(new Alert({ ...options, type: AlertType.Error, message }));
   }
 
-  info(message: string, options?: any) {
+  info(message: string, options?: Partial<Alert>) {
     this.alert(new Alert({ ...options, type: AlertType.Info, message }));
   }
 
-  warn(message: string, options?: any) {
+  warn(message: string, options?: Partial<Alert>) {
     this.alert(new Alert({ ...options, type: AlertType.Warning, message }));
   }
 

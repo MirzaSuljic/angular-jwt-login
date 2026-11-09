@@ -1,25 +1,20 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
 
-import { SubnavComponent } from './subnav.component';
+import { SubNavComponent } from './subnav.component';
 
-describe('SubnavComponent', () => {
-  let component: SubnavComponent;
-  let fixture: ComponentFixture<SubnavComponent>;
-
+describe('SubNavComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ SubnavComponent ]
-    })
-    .compileComponents();
-  });
-
-  beforeEach(() => {
-    fixture = TestBed.createComponent(SubnavComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+      imports: [SubNavComponent],
+      providers: [provideRouter([]), provideHttpClient(), provideHttpClientTesting()],
+    }).compileComponents();
   });
 
   it('should create', () => {
-    expect(component).toBeTruthy();
+    const fixture = TestBed.createComponent(SubNavComponent);
+    expect(fixture.componentInstance).toBeTruthy();
   });
 });

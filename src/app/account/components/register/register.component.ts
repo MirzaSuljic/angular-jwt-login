@@ -1,28 +1,29 @@
-import { Component, OnInit } from '@angular/core';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { first } from 'rxjs/operators';
-import { MustMatch } from 'src/app/_helpers/must-match.validator';
-import { AccountService } from 'src/app/_services/account.service';
-import { AlertService } from 'src/app/_services/alert.service';
+
+import { MustMatch } from '../../../_helpers/must-match.validator';
+import { AccountService } from '../../../_services/account.service';
+import { AlertService } from '../../../_services/alert.service';
 
 @Component({
   selector: 'app-register',
+  imports: [ReactiveFormsModule, RouterLink],
   templateUrl: './register.component.html',
-  styleUrls: ['./register.component.css'],
+  styleUrl: './register.component.css',
+  changeDetection: ChangeDetectionStrategy.Eager,
 })
 export class RegisterComponent implements OnInit {
+  private formBuilder = inject(FormBuilder);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private accountService = inject(AccountService);
+  private alertService = inject(AlertService);
+
   form: FormGroup;
   loading = false;
   submitted = false;
-
-  constructor(
-    private formBuilder: FormBuilder,
-    private route: ActivatedRoute,
-    private router: Router,
-    private accountService: AccountService,
-    private alertService: AlertService
-  ) {}
 
   ngOnInit() {
     this.form = this.formBuilder.group(
@@ -36,7 +37,7 @@ export class RegisterComponent implements OnInit {
         acceptTerms: [false, Validators.requiredTrue],
       },
       {
-        validator: MustMatch('password', 'confirmPassword'),
+        validators: MustMatch('password', 'confirmPassword'),
       }
     );
   }
